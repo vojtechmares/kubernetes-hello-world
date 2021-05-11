@@ -1,0 +1,102 @@
+project_name: kubernetes-hello-world
+
+before:
+  hooks:
+    - go mod tidy
+builds:
+  -
+    env:
+      - CGO_ENABLED=0
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s
+      - -w
+      - -X github.com/vojtechmares/kubernetes-hello-world/main.version={{.Version}}
+    goos:
+      - linux
+    goarch:
+      - amd64
+      - arm64
+    binary: hello
+
+archives:
+  - format: tar.gz
+    name_template: "{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+
+checksum:
+  name_template: "checksums.txt"
+  algorithm: sha256
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs'
+      - '^test'
+
+dockers:
+  - goos: linux
+    goarch: amd64
+    image_templates:
+      - "vojtechmares/kubernetes-hello-world:stable"
+      - "vojtechmares/kubernetes-hello-world:{{ .Tag }}"
+    skip_push: false
+    dockerfile: Dockerfile
+    binaries:
+      - hello
+    use_buildx: true
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.label-schema.schema-version=1.0"
+      - "--label=org.label-schema.version={{.Version}}"
+      - "--label=org.label-schema.name={{.ProjectName}}"
+      - "--label=com.github.actions.name={{.ProjectName}}"
+      - "--label=com.github.actions.description=Kubernetes HTTP Hello World"
+      - "--label=com.github.actions.icon=terminal"
+      - "--label=com.github.actions.color=blue"
+      - "--label=repository=https://github.com/vojtechmares/kubernetes-hello-world"
+      - "--label=maintainer=Vojtech Mares <iam@vojtechmares.com>"
+  - goos: linux
+    goarch: arm64
+    image_templates:
+      - "vojtechmares/kubernetes-hello-world:stable-arm64v8"
+      - "vojtechmares/kubernetes-hello-world:{{ .Tag }}-arm64v8"
+    skip_push: false
+    dockerfile: Dockerfile
+    binaries:
+      - hello
+    use_buildx: true
+    build_flag_templates:
+      - "--platform=linux/arm64/v8"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.label-schema.schema-version=1.0"
+      - "--label=org.label-schema.version={{.Version}}"
+      - "--label=org.label-schema.name={{.ProjectName}}"
+      - "--label=com.github.actions.name={{.ProjectName}}"
+      - "--label=com.github.actions.description=Kubernetes HTTP Hello World"
+      - "--label=com.github.actions.icon=terminal"
+      - "--label=com.github.actions.color=blue"
+      - "--label=repository=https://github.com/vojtechmares/kubernetes-hello-world"
+      - "--label=maintainer=Vojtech Mares <iam@vojtechmares.com>"
+
+docker_manifests:
+  - name_template: "vojtechmares/kubernetes-hello-world:{{ .Tag }}"
+    image_templates:
+    - "vojtechmares/kubernetes-hello-world:{{ .Tag }}"
+    - "vojtechmares/kubernetes-hello-world:{{ .Tag }}-arm64v8"
+  - name_template: "vojtechmares/kubernetes-hello-world:stable"
+    image_templates:
+    - "vojtechmares/kubernetes-hello-world:stable"
+    - "vojtechmares/kubernetes-hello-world:stable-arm64v8"
