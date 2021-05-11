@@ -1,0 +1,18 @@
+{{- if .Values.USE_NODEPORT -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubernetes-hello-world
+  labels:
+    app: kubernetes-hello-world
+spec:
+  type: NodePort
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: http
+      nodePort: {{ .Values.NODEPORT_NUMBER }}
+  selector:
+    app: kubernetes-hello-world
+{{- end -}}

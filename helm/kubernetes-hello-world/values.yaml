@@ -1,0 +1,6 @@
+host:
+
+USE_NODEPORT: false
+NODEPORT_NUMBER: 30000
+changeCause: null
+image: vojtechmares/kubernetes-hello-world:stable
